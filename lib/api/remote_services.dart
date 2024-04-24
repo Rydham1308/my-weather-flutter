@@ -2,9 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:my_weather_app/constants/sp_keys.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'model_class.dart';
 
 class RemoteServices {
@@ -49,12 +47,8 @@ class RemoteServices {
       }
 
       //endregion
-    } catch (e) {
-      if (e is SocketException) {
-        RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.networkError));
-      } else {
-        RemoteServices.apiHelperBoolStream.add(false);
-      }
+    } on SocketException catch (_) {
+      RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.networkError));
     }
   }
 }

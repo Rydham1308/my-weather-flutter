@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:my_weather_app/api/remote_services.dart';
@@ -68,7 +68,7 @@ class _GetBottomSheetState extends State<GetBottomSheet> {
               onPressed: () async {
                 try{
                   List<Location> locations = await locationFromAddress(txtCity.text.trim());
-                  print(locations);
+
                   SharedPreferences sp = await SharedPreferences.getInstance();
                   sp.setString(SpKeys.cityKey, txtCity.text.trim());
 

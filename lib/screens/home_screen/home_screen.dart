@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
@@ -102,16 +104,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 );
               } else if (snapshot.data?.status == ApiStatus.networkError) {
-                return const Column(
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.wifi_tethering_error_rounded_rounded,
-                      size: 40,
+                      size: 69,color: Colors.white,
                     ),
-                    Text(
+                    const Text(
                       'Network Error',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 30,color: Colors.white),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(left: 23, bottom: 15),
+                      // alignment: Alignment.centerLeft,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          getCity();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shadowColor: Colors.transparent,
+                          backgroundColor: Colors.white,
+                          elevation: 0,
+                          shape: const StadiumBorder(),
+                          minimumSize: const Size(150, 40),
+                        ),
+                        child: const Text(
+                          "Retry",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 15,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 );
@@ -144,8 +171,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           hum: hum,
                         ),
                         refreshCallBack: () async {
-                          List<Location> locations = await locationFromAddress(cityName ?? 'Ahmedabad');
-                          RemoteServices.getWeather(locations);
+                          try{
+                            List<Location> locations = await locationFromAddress(cityName ?? 'Ahmedabad');
+                            RemoteServices.getWeather(locations);
+                          }catch(_){
+                            RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.networkError));
+                          }
+
                         },
                       )
 
@@ -220,8 +252,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Future<void> getCity() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     cityName = sp.getString(SpKeys.cityKey);
-    List<Location> locations = await locationFromAddress(cityName ?? 'Ahmedabad');
-    RemoteServices.getWeather(locations);
+    try{
+      List<Location> locations = await locationFromAddress(cityName ?? 'Ahmedabad');
+      RemoteServices.getWeather(locations);
+    }catch(_){
+      RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.networkError));
+    }
     // return cityName ?? '';
   }
 }
