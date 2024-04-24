@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:my_weather_app/api/remote_services.dart';
 import 'package:my_weather_app/constants/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,7 +35,7 @@ class _GetBottomSheetState extends State<GetBottomSheet> {
             alignment: Alignment.centerLeft,
             child: const Text(
               "Search city name",
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600,color: Colors.blue),
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.blue),
             ),
           ),
           Container(
@@ -64,10 +66,30 @@ class _GetBottomSheetState extends State<GetBottomSheet> {
             alignment: Alignment.centerLeft,
             child: ElevatedButton(
               onPressed: () async {
-                SharedPreferences sp = await SharedPreferences.getInstance();
-                sp.setString(SpKeys.cityKey, txtCity.text.trim());
-                RemoteServices.getWeather(txtCity.text.trim());
-                Future.delayed(Duration.zero).then((value) => Navigator.pop(context));
+                try{
+                  List<Location> locations = await locationFromAddress(txtCity.text.trim());
+                  print(locations);
+                  SharedPreferences sp = await SharedPreferences.getInstance();
+                  sp.setString(SpKeys.cityKey, txtCity.text.trim());
+
+                  RemoteServices.getWeather(locations);
+                  Future.delayed(Duration.zero).then((value) => Navigator.pop(context));
+                }catch(e){
+                  Future.delayed(Duration.zero).then((value) => Navigator.pop(context));
+
+                  Future.delayed(Duration.zero).then(
+                        (value) => ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.redAccent,
+                        content: Text(
+                          'Enter valid city-name',
+                          style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),
+                        ),
+                        duration: Duration(milliseconds: 1500),
+                      ),
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 shadowColor: Colors.transparent,

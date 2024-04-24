@@ -14,53 +14,46 @@ class RemoteServices {
 
   static BehaviorSubject<bool> apiHelperBoolStream = BehaviorSubject<bool>();
 
-  static Future<void> getWeather(String? cityName) async {
+  static Future<void> getWeather(List<Location>? locations) async {
     RemoteServices.apiHelperBoolStream.add(true);
     try {
-      List<Location> locations = await locationFromAddress(cityName ?? 'Ahmedabad');
-      print(locations);
-      if (locations.isNotEmpty) {
-        final dio = Dio();
-        final response = await dio.get(uri, queryParameters: {
-          'lat': locations[0].latitude,
-          'lon': locations[0].longitude,
-          'units': 'metric',
-          'appid': key,
-        });
-        if (kDebugMode) {
-          print(response.requestOptions.uri);
-        }
-        if (response.statusCode == 200) {
-          //#region --weatherMain
-          final resultWeatherMain = response.data;
-          if (resultWeatherMain != null) {
-            final weatherMainData = WeatherMainModel.fromJson(resultWeatherMain);
-            final resultWeather = (resultWeatherMain['weather'] is List)
-                ? (resultWeatherMain?['weather'] ?? []) as List<dynamic>
-                : null;
-            final weatherData = resultWeather?.map((e) => WeatherModel.fromJson(e)).toList();
-            RemoteServices.apiHelperBoolStream.add(false);
-            RemoteServices.apiHelperStream.add(ApiHelper(
-                status: ApiStatus.isLoaded,
-                weatherMainResult: weatherMainData,
-                weatherModel: weatherData));
-          } else {
-            RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isLoaded));
-          }
+      final dio = Dio();
+      final response = await dio.get(uri, queryParameters: {
+        'lat': locations?[0].latitude ?? 23.022,
+        'lon': locations?[0].longitude ?? 72.54,
+        'units': 'metric',
+        'appid': key,
+      });
+      if (kDebugMode) {
+        print(response.requestOptions.uri);
+      }
+      if (response.statusCode == 200) {
+        //#region --weatherMain
+        final resultWeatherMain = response.data;
+        if (resultWeatherMain != null) {
+          final weatherMainData = WeatherMainModel.fromJson(resultWeatherMain);
+          final resultWeather = (resultWeatherMain['weather'] is List)
+              ? (resultWeatherMain?['weather'] ?? []) as List<dynamic>
+              : null;
+          final weatherData = resultWeather?.map((e) => WeatherModel.fromJson(e)).toList();
+          RemoteServices.apiHelperBoolStream.add(false);
+          RemoteServices.apiHelperStream.add(ApiHelper(
+              status: ApiStatus.isLoaded,
+              weatherMainResult: weatherMainData,
+              weatherModel: weatherData));
         } else {
-          RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isError));
+          RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isLoaded));
         }
-
-        //endregion
       } else {
         RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isError));
       }
+
+      //endregion
     } catch (e) {
-      if(e is SocketException){
+      if (e is SocketException) {
         RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.networkError));
-      }else{
+      } else {
         RemoteServices.apiHelperBoolStream.add(false);
-        RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isLoaded));
       }
     }
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import 'package:my_weather_app/api/remote_services.dart';
 import 'package:my_weather_app/constants/sp_keys.dart';
@@ -131,7 +132,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
                 //endregion
 
-                return (snapshot.data?.weatherMainResult?.name) != null
+                return (snapshot.data/*?.weatherMainResult?.name*/) != null
                     ? WeatherCard(
                         controller: _controller,
                         model: CardModel(
@@ -142,8 +143,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           wind: wind,
                           hum: hum,
                         ),
-                        refreshCallBack: () {
-                          RemoteServices.getWeather(cityName);
+                        refreshCallBack: () async {
+                          List<Location> locations = await locationFromAddress(cityName ?? 'Ahmedabad');
+                          RemoteServices.getWeather(locations);
                         },
                       )
 
@@ -218,7 +220,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Future<void> getCity() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     cityName = sp.getString(SpKeys.cityKey);
-    RemoteServices.getWeather(cityName);
+    List<Location> locations = await locationFromAddress(cityName ?? 'Ahmedabad');
+    RemoteServices.getWeather(locations);
     // return cityName ?? '';
   }
 }
