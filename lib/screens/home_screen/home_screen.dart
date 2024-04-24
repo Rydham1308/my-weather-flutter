@@ -7,6 +7,7 @@ import 'package:my_weather_app/model/card_model.dart';
 import 'package:my_weather_app/screens/home_screen/weather_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../api/model_class.dart';
+import 'bottomsheet.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,7 +33,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
     getCity();
     RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isLoading));
-
   }
 
   @override
@@ -59,6 +59,47 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ));
               } else if (snapshot.data?.status == ApiStatus.isError) {
                 return const Center(child: Text('No Data'));
+              } else if (snapshot.data?.status == ApiStatus.cityNotAvailable) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 30),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                            isScrollControlled: true,
+                            backgroundColor: Colors.white,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(30), topLeft: Radius.circular(30)),
+                            ),
+                            context: context,
+                            builder: (context) {
+                              return Padding(
+                                padding: MediaQuery.of(context).viewInsets,
+                                child: const GetBottomSheet(),
+                              );
+                            });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(20))),
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.white38,
+                        shadowColor: Colors.transparent,
+                        elevation: 0,
+                        minimumSize: const Size(250, 50),
+                      ),
+                      child: const Text(
+                        'Search City',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                          color: Color(0xFF444E72),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               } else if (snapshot.data?.status == ApiStatus.networkError) {
                 return const Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -90,7 +131,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
                 //endregion
 
-                return (snapshot.data) != null
+                return (snapshot.data?.weatherMainResult?.name) != null
                     ? WeatherCard(
                         controller: _controller,
                         model: CardModel(
@@ -107,20 +148,63 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       )
 
                     //#region -- Error Msg from api
-                    : const Center(
+                    : Center(
                         child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.not_interested_rounded,
-                            size: 40,
-                          ),
-                          Text(
-                            'No Data Found',
-                            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
-                          ),
-                        ],
-                      ));
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.not_interested_rounded,
+                              size: 40,
+                            ),
+                            const Text(
+                              'Enter Valid City Name!!',
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+                            ),
+                            //#region -- Button
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.white,
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(30),
+                                            topLeft: Radius.circular(30)),
+                                      ),
+                                      context: context,
+                                      builder: (context) {
+                                        return Padding(
+                                          padding: MediaQuery.of(context).viewInsets,
+                                          child: const GetBottomSheet(),
+                                        );
+                                      });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(20))),
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.white38,
+                                  shadowColor: Colors.transparent,
+                                  elevation: 0,
+                                  minimumSize: const Size(250, 50),
+                                ),
+                                child: const Text(
+                                  'Search City',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 15,
+                                    color: Color(0xFF444E72),
+                                  ),
+                                ),
+                              ),
+                            )
+                            //endregion
+                          ],
+                        ),
+                      );
                 //endregion
               }
               return const SizedBox.shrink();

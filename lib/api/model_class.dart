@@ -1,4 +1,4 @@
-enum ApiStatus { isLoaded, isLoading, isError, networkError }
+enum ApiStatus { isLoaded, isLoading, isError, networkError, cityNotAvailable }
 
 class ApiHelper {
   final ApiStatus status;

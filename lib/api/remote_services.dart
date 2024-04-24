@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:my_weather_app/constants/sp_keys.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'model_class.dart';
 
 class RemoteServices {
@@ -16,42 +18,50 @@ class RemoteServices {
     RemoteServices.apiHelperBoolStream.add(true);
     try {
       List<Location> locations = await locationFromAddress(cityName ?? 'Ahmedabad');
-
-      final dio = Dio();
-      final response = await dio.get(uri, queryParameters: {
-        'lat': locations[0].latitude,
-        'lon': locations[0].longitude,
-        'units': 'metric',
-        'appid': key,
-      });
-      if (kDebugMode) {
-        print(response.requestOptions.uri);
-      }
-      if (response.statusCode == 200) {
-        //#region --weatherMain
-        final resultWeatherMain = response.data;
-        if (resultWeatherMain != null) {
-          final weatherMainData = WeatherMainModel.fromJson(resultWeatherMain);
-          final resultWeather = (resultWeatherMain['weather'] is List)
-              ? (resultWeatherMain?['weather'] ?? []) as List<dynamic>
-              : null;
-          final weatherData = resultWeather?.map((e) => WeatherModel.fromJson(e)).toList();
-          RemoteServices.apiHelperBoolStream.add(false);
-          RemoteServices.apiHelperStream.add(ApiHelper(
-              status: ApiStatus.isLoaded,
-              weatherMainResult: weatherMainData,
-              weatherModel: weatherData));
-        } else {
-          RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isLoaded));
+      print(locations);
+      if (locations.isNotEmpty) {
+        final dio = Dio();
+        final response = await dio.get(uri, queryParameters: {
+          'lat': locations[0].latitude,
+          'lon': locations[0].longitude,
+          'units': 'metric',
+          'appid': key,
+        });
+        if (kDebugMode) {
+          print(response.requestOptions.uri);
         }
+        if (response.statusCode == 200) {
+          //#region --weatherMain
+          final resultWeatherMain = response.data;
+          if (resultWeatherMain != null) {
+            final weatherMainData = WeatherMainModel.fromJson(resultWeatherMain);
+            final resultWeather = (resultWeatherMain['weather'] is List)
+                ? (resultWeatherMain?['weather'] ?? []) as List<dynamic>
+                : null;
+            final weatherData = resultWeather?.map((e) => WeatherModel.fromJson(e)).toList();
+            RemoteServices.apiHelperBoolStream.add(false);
+            RemoteServices.apiHelperStream.add(ApiHelper(
+                status: ApiStatus.isLoaded,
+                weatherMainResult: weatherMainData,
+                weatherModel: weatherData));
+          } else {
+            RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isLoaded));
+          }
+        } else {
+          RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isError));
+        }
+
         //endregion
       } else {
         RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isError));
-        throw Exception('Failed to load album');
       }
-    } on SocketException catch (e) {
-      RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.networkError));
-      throw Exception('network error : $e');
+    } catch (e) {
+      if(e is SocketException){
+        RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.networkError));
+      }else{
+        RemoteServices.apiHelperBoolStream.add(false);
+        RemoteServices.apiHelperStream.add(ApiHelper(status: ApiStatus.isLoaded));
+      }
     }
   }
 }
