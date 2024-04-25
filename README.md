@@ -4,7 +4,8 @@ Our Flutter Weather App harnesses the power of the OpenWeather API to deliver ac
 
 Got it. Here's a customized "Getting Started" guide for the provided GitHub repository:
 
-Getting Started:
+## Getting Started:
+
 1. Clone the repository from GitHub: [my-weather-flutter](https://github.com/Rydham1308/my-weather-flutter).
    ```bash
    git clone https://github.com/Rydham1308/my-weather-flutter.git
