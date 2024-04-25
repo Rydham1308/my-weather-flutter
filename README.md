@@ -2,15 +2,37 @@
 
 A new Flutter project.
 
-## Getting Started
+Got it. Here's a customized "Getting Started" guide for the provided GitHub repository:
 
-This project is a starting point for a Flutter application.
+Getting Started:
+1. Clone the repository from GitHub: [my-weather-flutter](https://github.com/Rydham1308/my-weather-flutter).
+   ```bash
+   git clone https://github.com/Rydham1308/my-weather-flutter.git
+   ```
+2. Navigate to the project directory in your terminal.
+   ```bash
+   cd my-weather-flutter
+   ```
+3. Ensure you have Flutter installed on your machine. If not, follow the Flutter installation instructions [here](https://flutter.dev/docs/get-started/install).
+4. Install dependencies by running `flutter pub get`.
+   ```bash
+   flutter pub get
+   ```
+5. Sign up for an API key from OpenWeather [here](https://openweathermap.org/api) if you haven't already.
+6. Open the project in your preferred code editor.
+7. Navigate to the `lib` directory and open the `utilities` folder.
+8. Inside the `api` folder, you'll find a file named `remote_services.dart`.
+   ```bash
+   cd lib/api/
+   ```
+9. Open the `remote_services.dart` file in your code editor and replace `"API_KEY"` with your actual OpenWeather API key.
+   ```dart
+   static const String key = 'API_KEY';
+   ```
+10. Save the `api_key.dart` file.
+11. Build and run the app on your preferred device or emulator using `flutter run`.
+    ```bash
+    flutter run
+    ```
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This should get you started with running the Flutter weather app based on the provided repository. If you encounter any issues or have any questions, feel free to ask!
