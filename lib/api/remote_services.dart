@@ -6,7 +6,7 @@ import 'package:rxdart/rxdart.dart';
 import 'model_class.dart';
 
 class RemoteServices {
-  static const String key = 'f2a1a29cb719f92f4d7859ba26b1d1fb';
+  static const String key = 'API_KEY';
   static const String uri = 'https://api.openweathermap.org/data/2.5/weather';
   static BehaviorSubject<ApiHelper> apiHelperStream = BehaviorSubject<ApiHelper>();
 
